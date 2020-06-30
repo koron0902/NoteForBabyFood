@@ -38,7 +38,7 @@ namespace GoodByeMilk {
 
       };
 
-      dataManager_ = new Util.DataManager();
+      dataManager_ = new Util.DataManager(ApplicationContext);
 
       calendarGridView = FindViewById<GridView>(Resource.Id.calendarGridView);
       mCalendarAdapter = new MainView.CalendarAdapter(this, dataManager_.dataRef_);
@@ -86,7 +86,7 @@ namespace GoodByeMilk {
 
     protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data) {
       base.OnActivityResult(requestCode, resultCode, data);
-      var editResult = data.GetParcelableArrayListExtra("editResult").Cast<Util.Data>().ToList();
+      var editResult = data.GetParcelableArrayListExtra("editResult").Cast<Util.BabyFood>().ToList();
       var date = DateTime.Parse(data.GetStringExtra("date"));
 
       var origData = dataManager_.dataRef_.Where(elm => elm.date_.Date == date);
