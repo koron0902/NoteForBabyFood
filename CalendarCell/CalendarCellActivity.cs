@@ -18,14 +18,14 @@ namespace GoodByeMilk.CalendarCell {
   [Activity(Label = "CalendarCellActivity")]
   public class CalendarCellActivity : Activity {
     const int MENU_EDIT = 0x00;
-    List<Util.Data> foodList_;
+    List<Util.BabyFood> foodList_;
     RecyclerView recycler_;
     CalendarCellAdapter adapter_;
     DateTime date_;
     protected override void OnCreate(Bundle savedInstanceState) {
       base.OnCreate(savedInstanceState);
       SetContentView(Resource.Layout.calendar_cell_activity);
-      foodList_ = this.Intent.GetParcelableArrayListExtra("card").Cast<Util.Data>().ToList();
+      foodList_ = this.Intent.GetParcelableArrayListExtra("card").Cast<Util.BabyFood>().ToList();
       FindViewById<TextView>(Resource.Id.dateTimeInCell).Text = Intent.GetStringExtra("date");
       date_ = DateTime.Parse(Intent.GetStringExtra("date"));
 
@@ -72,7 +72,7 @@ namespace GoodByeMilk.CalendarCell {
           var unit_ = view.FindViewById<EditText>(Resource.Id.editorUnit).Text;
           int quant_;
           int.TryParse(quantStr_, out quant_);
-          foodList_.Add(new Util.Data((Util.Data.Kind)when.SelectedItemId, date_, what_, unit_, quant_));
+          foodList_.Add(new Util.BabyFood((Util.BabyFood.Kind)when.SelectedItemId, date_, what_, unit_, quant_));
           adapter_.NotifyItemInserted(foodList_.Count - 1);
           popup.Dismiss();
         };
@@ -118,7 +118,8 @@ namespace GoodByeMilk.CalendarCell {
           var unit_ = view.FindViewById<EditText>(Resource.Id.editorUnit).Text;
           int quant_;
           int.TryParse(quantStr_, out quant_);
-          foodList_[position] = new Util.Data((Util.Data.Kind)when.SelectedItemId, date_, what_, unit_, quant_);
+
+          foodList_[position] = new Util.BabyFood((Util.BabyFood.Kind)when.SelectedItemId, date_, what_, unit_, quant_);
           adapter_.NotifyItemChanged(position);
           popup.Dismiss();
         };
@@ -135,7 +136,7 @@ namespace GoodByeMilk.CalendarCell {
       base.OnActivityResult(requestCode, resultCode, data);
       switch(requestCode) {
       case MENU_EDIT:
-        var editResult = data.GetParcelableArrayListExtra("editResult").Cast<Util.Data>().ToList();
+        var editResult = data.GetParcelableArrayListExtra("editResult").Cast<Util.BabyFood>().ToList();
         foodList_.AddRange(editResult);
         adapter_.NotifyDataSetChanged();
         break;
