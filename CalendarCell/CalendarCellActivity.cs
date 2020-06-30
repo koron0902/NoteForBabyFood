@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using Android.App;
 using Android.Content;
@@ -10,9 +9,9 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using System.Linq;
 using Android.Support.V7.Widget;
 using Android.Support.Design.Widget;
+using Android.Support.V7.Widget.Helper;
 
 namespace GoodByeMilk.CalendarCell {
   [Activity(Label = "CalendarCellActivity")]
@@ -43,7 +42,7 @@ namespace GoodByeMilk.CalendarCell {
       recycler_.SetAdapter(adapter_);
 
 
-
+      #region Click FAB
       FindViewById<FloatingActionButton>(Resource.Id.EditFoodMenu).Click += (sender, e) => {
         var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
         var view = LayoutInflater.Inflate(Resource.Layout.food_list_element_edit, null);
@@ -55,7 +54,7 @@ namespace GoodByeMilk.CalendarCell {
         popup.ContentView = view;
         popup.SetBackgroundDrawable(GetDrawable(Resource.Drawable.abc_popup_background_mtrl_mult));
         popup.Width = (int)(point.X * 0.8);
-        popup.Height = (int)(point.Y * 0.555555);
+        popup.Height = (int)(point.Y * 0.4);
 
 
         var when = view.FindViewById<Spinner>(Resource.Id.editorWhen);
@@ -81,7 +80,9 @@ namespace GoodByeMilk.CalendarCell {
         popup.ShowAtLocation(recycler_, GravityFlags.Center, 0, (int)(-point.Y * 0.1));
         //        StartActivityForResult(intent, MENU_EDIT);
       };
+      #endregion
 
+      #region Click List Element
       adapter_.onClick += (holder, position) => {
         if(!holder.ItemView.Clickable) return;
         holder.ItemView.Clickable = false;
@@ -98,7 +99,7 @@ namespace GoodByeMilk.CalendarCell {
         popup.ContentView = view;
         popup.SetBackgroundDrawable(GetDrawable(Resource.Drawable.abc_popup_background_mtrl_mult));
         popup.Width = (int)(point.X * 0.8);
-        popup.Height = (int)(point.Y * 0.555555);
+        popup.Height = (int)(point.Y * 0.4);
 
 
 
@@ -118,7 +119,6 @@ namespace GoodByeMilk.CalendarCell {
           var unit_ = view.FindViewById<EditText>(Resource.Id.editorUnit).Text;
           int quant_;
           int.TryParse(quantStr_, out quant_);
-
           foodList_[position] = new Util.BabyFood((Util.BabyFood.Kind)when.SelectedItemId, date_, what_, unit_, quant_);
           adapter_.NotifyItemChanged(position);
           popup.Dismiss();
@@ -127,6 +127,26 @@ namespace GoodByeMilk.CalendarCell {
 
         popup.ShowAtLocation(recycler_, GravityFlags.Center, 0, (int)(-point.Y * 0.1));
       };
+      #endregion
+
+      #region Swipe List Element
+      var itemTouchHelperCallback = new Util.ListItemTouchHelper();
+      itemTouchHelperCallback.onSwipe += (sender, _) => {
+        var archive = new KeyValuePair<int, Util.BabyFood>(((RecyclerView.ViewHolder)sender).AdapterPosition, foodList_[((RecyclerView.ViewHolder)sender).AdapterPosition]);
+        foodList_.RemoveAt(((RecyclerView.ViewHolder)sender).AdapterPosition);
+        adapter_.NotifyItemRemoved(((RecyclerView.ViewHolder)sender).AdapterPosition);
+
+        adapter_.NotifyDataSetChanged();
+        Snackbar.Make(recycler_, "データを削除しました", Snackbar.LengthLong).SetAction("元に戻す", (v) => {
+          foodList_.Insert(archive.Key, archive.Value);
+          adapter_.NotifyItemInserted(archive.Key);
+        }).Show();
+      };
+
+
+      var itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallback);
+      itemTouchHelper.AttachToRecyclerView(recycler_);
+      #endregion
 
       // Create your application here
     }
