@@ -13,11 +13,11 @@ namespace GoodByeMilk.MainView {
     private Context mContext;
     private Util.DateManager dateManager_;
     private LayoutInflater mLayoutInflater;
-    private IReadOnlyList<Util.Data> data_;
+    private IReadOnlyList<Util.BabyFood> data_;
 
     public override int Count => dateArray.Count;
 
-    public CalendarAdapter(Context context, IReadOnlyList<Util.Data> _data) {
+    public CalendarAdapter(Context context, IReadOnlyList<Util.BabyFood> _data) {
       mContext = context;
       data_ = _data;
       mLayoutInflater = LayoutInflater.From(mContext);
