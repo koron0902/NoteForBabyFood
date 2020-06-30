@@ -7,8 +7,8 @@ using Android.Support.V7.Widget.Helper;
 
 namespace GoodByeMilk.MenuEditor {
   public class MenuEditorAdapter:RecyclerView.Adapter {
-    List<Util.Data> data_;
-    public MenuEditorAdapter(List<Util.Data> _data) {
+    List<Util.BabyFood> data_;
+    public MenuEditorAdapter(List<Util.BabyFood> _data) {
       data_ = _data;
     }
 

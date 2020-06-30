@@ -73,6 +73,7 @@
     <Compile Include="MenuEditor\MenuEditorAdapter.cs" />
     <Compile Include="MenuEditor\MenuEditorViewHolder.cs" />
     <Compile Include="MenuEditor\MenuEditorItemTouchHelper.cs" />
+    <Compile Include="Util\BabyFood.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
