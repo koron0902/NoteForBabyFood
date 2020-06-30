@@ -11,9 +11,9 @@ namespace GoodByeMilk.MenuEditor {
     public MenuEditorItemTouchHelper(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) {
     }
 
-    public MenuEditorItemTouchHelper(int dragDirs = ItemTouchHelper.Left | ItemTouchHelper.Right,
+    public MenuEditorItemTouchHelper(int dragDirs = ItemTouchHelper.Up | ItemTouchHelper.Down,
       int swipeDirs = ItemTouchHelper.Left | ItemTouchHelper.Right) : base(dragDirs, swipeDirs) {
-     
+
     }
 
     public override bool OnMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
