@@ -20,8 +20,21 @@ namespace GoodByeMilk.CalendarCell {
       ((CalendarCellViewHolder)holder).when_.Text = Util.BabyFood.ToString(foodList_[position].kind_);
       ((CalendarCellViewHolder)holder).foodName_.Text = foodList_[position].menu_;
       ((CalendarCellViewHolder)holder).quant_.Text = foodList_[position].quantity_.ToString() + "(" + foodList_[position].unit_ + ")";
-      if(position % 2 == 0) ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.aquamarine)));
-      else ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.lightblue)));
+      switch(foodList_[position].kind_) {
+      case Util.BabyFood.Kind.MONING:
+        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.skyblue)));
+        break;
+      case Util.BabyFood.Kind.NOON:
+        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.paleturquoise)));
+        break;
+      case Util.BabyFood.Kind.EVENING:
+        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.powderblue)));
+        break;
+      case Util.BabyFood.Kind.SNACK:
+        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.lightblue)));
+        break;
+
+      }
 
       holder.ItemView.Click += (sender, e) => {
         onClick(holder, position);
