@@ -83,10 +83,7 @@ namespace GoodByeMilk.CalendarCell {
       #endregion
 
       #region Click List Element
-      adapter_.onClick += (holder, position) => {
-        if(!holder.ItemView.Clickable) return;
-        holder.ItemView.Clickable = false;
-        new Handler().PostDelayed(() => holder.ItemView.Clickable = true, 500);
+      adapter_.onClick += (position) => {
 
         var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
         var view = LayoutInflater.Inflate(Resource.Layout.food_list_element_edit, null);
@@ -135,11 +132,12 @@ namespace GoodByeMilk.CalendarCell {
         var archive = new KeyValuePair<int, Util.BabyFood>(((RecyclerView.ViewHolder)sender).AdapterPosition, foodList_[((RecyclerView.ViewHolder)sender).AdapterPosition]);
         foodList_.RemoveAt(((RecyclerView.ViewHolder)sender).AdapterPosition);
         adapter_.NotifyItemRemoved(((RecyclerView.ViewHolder)sender).AdapterPosition);
+        //adapter_.NotifyItemRangeChanged(archive.Key, foodList_.Count - archive.Key);
 
-        adapter_.NotifyDataSetChanged();
         Snackbar.Make(recycler_, "データを削除しました", Snackbar.LengthLong).SetAction("元に戻す", (v) => {
           foodList_.Insert(archive.Key, archive.Value);
           adapter_.NotifyItemInserted(archive.Key);
+          //adapter_.NotifyItemRangeChanged(archive.Key + 1, foodList_.Count - archive.Key + 1);
         }).Show();
       };
 

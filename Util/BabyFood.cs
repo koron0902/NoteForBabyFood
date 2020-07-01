@@ -33,16 +33,22 @@ namespace GoodByeMilk.Util {
     public string unit_;
     public int quantity_;
     public string hash_;
-    public BabyFood(Kind _kind, DateTime _date, string _menu, string _unit, int _quant) {
+    public BabyFood() { }
+    public BabyFood(Kind _kind, DateTime _date, string _menu, string _unit, int _quant, string? _hash = null) {
       kind_ = _kind;
       date_ = _date;
       menu_ = _menu;
       unit_ = _unit;
       quantity_ = _quant;
+      if(_hash != null) {
+        hash_ = _hash;
+        return;
+      }
       var hashByte = System.Security.Cryptography.SHA512.Create().ComputeHash(((new System.Text.ASCIIEncoding()).GetBytes(kind_ + date_.ToString("yyyyMMdd") + menu_ + unit_ + quantity_)));
 
       var builder = new System.Text.StringBuilder();
       foreach(var b in hashByte) {
+
         builder.Append(b.ToString("x2"));
       }
       hash_ = builder.ToString();

@@ -4,7 +4,8 @@
 	android:orientation="horizontal"
 	android:layout_width="match_parent"
 	android:layout_height="wrap_content"
-	android:paddingVertical="10dp">
+	android:paddingVertical="10dp"
+	android:id="@+id/holder">
 
 	<TextView
 		android:text="朝"
@@ -13,20 +14,23 @@
 		android:layout_height="wrap_content"
 		android:layout_marginLeft="20dp"
 		android:id="@+id/when"
-		android:autoText="true" />
+		android:autoText="true"
+		android:layout_gravity="center_vertical"/>
 	<TextView
 		android:text="Medium Text"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_width="180dp"
-		android:layout_height="match_parent"
+		android:layout_height="wrap_content"
 		android:layout_marginLeft="20dp"
-		android:id="@+id/foodName" />
+		android:id="@+id/foodName"
+		android:singleLine="false"/>
 	<TextView
 		android:text="Medium Text"
 		android:textAppearance="?android:attr/textAppearanceMedium"
 		android:layout_width="wrap_content"
-		android:layout_height="match_parent"
-		android:id="@+id/quant" />
+		android:layout_height="wrap_content"
+		android:id="@+id/quant"
+		android:layout_gravity="center_vertical"/>
 
 
 

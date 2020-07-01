@@ -74,6 +74,7 @@
     <Compile Include="MenuEditor\MenuEditorViewHolder.cs" />
     <Compile Include="MenuEditor\MenuEditorItemTouchHelper.cs" />
     <Compile Include="Util\BabyFood.cs" />
+    <Compile Include="Util\ListItemTouchHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />

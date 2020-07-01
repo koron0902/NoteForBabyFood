@@ -3,11 +3,14 @@ using Android.Support.V7.Widget;
 using Android.Views;
 using System.Collections.Generic;
 using Android.Content;
+using System.Reflection;
+using Android.OS;
 
 namespace GoodByeMilk.CalendarCell {
   public class CalendarCellAdapter : RecyclerView.Adapter {
     List<Util.BabyFood> foodList_;
-    public Action<RecyclerView.ViewHolder, int> onClick;
+    RecyclerView recycler_;
+    public Action<int> onClick;
     Context context_;
     public CalendarCellAdapter(Context _context, List<Util.BabyFood> _data) {
       foodList_ = _data;
@@ -20,25 +23,26 @@ namespace GoodByeMilk.CalendarCell {
       ((CalendarCellViewHolder)holder).when_.Text = Util.BabyFood.ToString(foodList_[position].kind_);
       ((CalendarCellViewHolder)holder).foodName_.Text = foodList_[position].menu_;
       ((CalendarCellViewHolder)holder).quant_.Text = foodList_[position].quantity_.ToString() + "(" + foodList_[position].unit_ + ")";
-      switch(foodList_[position].kind_) {
-      case Util.BabyFood.Kind.MONING:
-        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.skyblue)));
-        break;
-      case Util.BabyFood.Kind.NOON:
-        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.paleturquoise)));
-        break;
-      case Util.BabyFood.Kind.EVENING:
-        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.powderblue)));
-        break;
-      case Util.BabyFood.Kind.SNACK:
-        ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.lightblue)));
-        break;
 
-      }
+      holder.ItemView.Click -= ItemView_Click;
+      holder.ItemView.Click += ItemView_Click;
 
-      holder.ItemView.Click += (sender, e) => {
-        onClick(holder, position);
-      };
+      ((CalendarCellViewHolder)holder).ItemView.SetBackgroundColor(new Android.Graphics.Color(context_.GetColor(Resource.Color.powderblue)));
+    }
+
+    private void ItemView_Click(object sender, EventArgs e) {
+      var position = recycler_.GetChildAdapterPosition((View)sender);
+      onClick.Invoke(position);
+    }
+
+    public override void OnAttachedToRecyclerView(RecyclerView recyclerView) {
+      base.OnAttachedToRecyclerView(recyclerView);
+      recycler_ = recyclerView;
+    }
+
+    public override void OnDetachedFromRecyclerView(RecyclerView recyclerView) {
+      base.OnDetachedFromRecyclerView(recyclerView);
+      recycler_ = null;
     }
 
     public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {
@@ -48,5 +52,7 @@ namespace GoodByeMilk.CalendarCell {
           parent,
           false));
     }
+
+
   }
 }
