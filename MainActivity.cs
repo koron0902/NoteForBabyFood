@@ -8,6 +8,7 @@ using Android.Views;
 using Android.Widget;
 using System.Linq;
 using Android.Content;
+using Android.Content.PM;
 
 namespace GoodByeMilk {
   [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
@@ -17,10 +18,15 @@ namespace GoodByeMilk {
     private MainView.CalendarAdapter mCalendarAdapter;
     private GridView calendarGridView;
     Util.DataManager dataManager_;
+    Intent intent_;
 
     protected override void OnCreate(Bundle savedInstanceState) {
       base.OnCreate(savedInstanceState);
-      Xamarin.Essentials.Platform.Init(this, savedInstanceState);
+
+      if(!checkPermission(true)) {
+        requestPermission(true);
+      }
+
       SetContentView(Resource.Layout.activity_main);
 
 
@@ -49,11 +55,11 @@ namespace GoodByeMilk {
         var selectedDate = DateTime.Parse((string)((GridView)sender).GetItemAtPosition(e.Position));
 
         var foodList = dataManager_.dataRef_.Where(elm => elm.date_.Date == selectedDate);
-        var intent = new Android.Content.Intent(this, typeof(CalendarCell.CalendarCellActivity));
-        intent.PutExtra("date", selectedDate.ToString("yyyy年MM月dd日"));
-        intent.PutParcelableArrayListExtra("card", foodList.ToArray());
-
-        StartActivityForResult(intent, 0x00);
+        intent_ = new Android.Content.Intent(this, typeof(CalendarCell.CalendarCellActivity));
+        intent_.PutExtra("date", selectedDate.ToString("yyyy年MM月dd日"));
+        intent_.PutParcelableArrayListExtra("card", foodList.ToArray());
+        if(checkPermission(false)) StartActivityForResult(intent_, 0x00);
+        else requestPermission(false);
       };
 
       titleText.Text = mCalendarAdapter.getTitle();
@@ -73,15 +79,17 @@ namespace GoodByeMilk {
       return base.OnOptionsItemSelected(item);
     }
 
-    private void FabOnClick(object sender, EventArgs eventArgs) {
-      View view = (View)sender;
-      Snackbar.Make(view, "Replace with your own action", Snackbar.LengthLong)
-          .SetAction("Action", (Android.Views.View.IOnClickListener)null).Show();
-    }
+
     public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults) {
       Xamarin.Essentials.Platform.OnRequestPermissionsResult(requestCode, permissions, grantResults);
 
       base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+
+      switch(requestCode) {
+      case 0xFF:
+        if(grantResults.Where(p => p == Permission.Denied).Count() == 0 && intent_ != null) StartActivityForResult(intent_, 0x00);
+        break;
+      }
     }
 
     protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data) {
@@ -99,6 +107,39 @@ namespace GoodByeMilk {
       mCalendarAdapter.NotifyDataSetChanged();
 
     }
+
+
+    // Runtime Permission check
+    private bool checkPermission(bool _cold) {
+      // 既に許可している
+      return ((CheckSelfPermission(Android.Manifest.Permission.Camera) == Permission.Granted &
+        CheckSelfPermission(Android.Manifest.Permission.WriteExternalStorage) == Permission.Granted) |
+        !_cold) &&
+        CheckSelfPermission(Android.Manifest.Permission.ReadExternalStorage) == Permission.Granted;
+    }
+
+    // 許可を求める
+    private void requestPermission(bool _cold) {
+      string[] req;
+      if(_cold) {
+        req = new[] {
+          Android.Manifest.Permission.Camera,
+          Android.Manifest.Permission.WriteExternalStorage,
+          Android.Manifest.Permission.ReadExternalStorage };
+      } else {
+        req = new[] {
+          Android.Manifest.Permission.ReadExternalStorage };
+      }
+
+      if(ShouldShowRequestPermissionRationale(Android.Manifest.Permission.Camera) ||
+        ShouldShowRequestPermissionRationale(Android.Manifest.Permission.WriteExternalStorage) ||
+        ShouldShowRequestPermissionRationale(Android.Manifest.Permission.ReadExternalStorage)) {
+        RequestPermissions(req, 0xFF);
+      } else {
+        RequestPermissions(req, 0xFF);
+      }
+    }
+
   }
 }
 

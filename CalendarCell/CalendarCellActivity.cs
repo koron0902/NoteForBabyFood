@@ -12,21 +12,63 @@ using Android.Widget;
 using Android.Support.V7.Widget;
 using Android.Support.Design.Widget;
 using Android.Support.V7.Widget.Helper;
+using Android.Content.PM;
 
 namespace GoodByeMilk.CalendarCell {
   [Activity(Label = "CalendarCellActivity")]
   public class CalendarCellActivity : Activity {
-    const int MENU_EDIT = 0x00;
+    const int CAMERA = 0x00;
     List<Util.BabyFood> foodList_;
+    List<string> imageList_;
     RecyclerView recycler_;
+    RecyclerView image_;
     CalendarCellAdapter adapter_;
+    Camera.CameraAdapter cameraAdapter_;
     DateTime date_;
+    string path_;
+    string intentPath_;
     protected override void OnCreate(Bundle savedInstanceState) {
       base.OnCreate(savedInstanceState);
       SetContentView(Resource.Layout.calendar_cell_activity);
       foodList_ = this.Intent.GetParcelableArrayListExtra("card").Cast<Util.BabyFood>().ToList();
       FindViewById<TextView>(Resource.Id.dateTimeInCell).Text = Intent.GetStringExtra("date");
+
+
+
       date_ = DateTime.Parse(Intent.GetStringExtra("date"));
+      imageList_ = new List<string>();
+
+      if(!System.IO.Directory.Exists(System.IO.Path.Combine(GetExternalFilesDir(null).Path, date_.Year.ToString()))) {
+        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(GetExternalFilesDir(null).Path, date_.Year.ToString()));
+      }
+
+      if(!System.IO.Directory.Exists(System.IO.Path.Combine(GetExternalFilesDir(null).Path, date_.Year.ToString(), date_.Month.ToString()))) {
+        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(GetExternalFilesDir(null).Path, date_.Year.ToString(), date_.Month.ToString()));
+      }
+
+      if(!System.IO.Directory.Exists(System.IO.Path.Combine(GetExternalFilesDir(null).Path, date_.Year.ToString(), date_.Month.ToString(), date_.Day.ToString()))) {
+        System.IO.Directory.CreateDirectory(System.IO.Path.Combine(GetExternalFilesDir(null).Path, date_.Year.ToString(), date_.Month.ToString(), date_.Day.ToString()));
+      }
+
+      path_ = System.IO.Path.Combine(GetExternalFilesDir(null).Path, date_.Year.ToString(), date_.Month.ToString(), date_.Day.ToString());
+      if(System.IO.Directory.Exists(path_)) {
+        imageList_ = System.IO.Directory.GetFiles(path_).ToList();
+      }
+
+      cameraAdapter_ = new Camera.CameraAdapter(ApplicationContext, imageList_);
+      var cameraManager = new LinearLayoutManager(this);
+      cameraManager.Orientation = LinearLayoutManager.Horizontal;
+      image_ = FindViewById<RecyclerView>(Resource.Id.imageList);
+      image_.HasFixedSize = false;
+      image_.SetLayoutManager(cameraManager);
+      image_.SetAdapter(cameraAdapter_);
+
+
+
+
+
+
+
 
 
       Android.Graphics.Point point = new Android.Graphics.Point();
@@ -44,7 +86,7 @@ namespace GoodByeMilk.CalendarCell {
 
       #region Click FAB
       FindViewById<FloatingActionButton>(Resource.Id.EditFoodMenu).Click += (sender, e) => {
-        var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
+        /*var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
         var view = LayoutInflater.Inflate(Resource.Layout.food_list_element_edit, null);
         view.SetBackgroundColor(new Android.Graphics.Color(GetColor(Resource.Color.mintcream)));
         var popup = new PopupWindow(this);
@@ -77,7 +119,13 @@ namespace GoodByeMilk.CalendarCell {
         };
 
 
-        popup.ShowAtLocation(recycler_, GravityFlags.Center, 0, (int)(-point.Y * 0.1));
+        popup.ShowAtLocation(recycler_, GravityFlags.Center, 0, (int)(-point.Y * 0.1));*/
+        if(Build.VERSION.SdkInt >= BuildVersionCodes.M) {
+          if(checkPermission()) cameraIntent();
+          else requestPermission();
+        } else {
+          cameraIntent();
+        }
         //        StartActivityForResult(intent, MENU_EDIT);
       };
       #endregion
@@ -153,10 +201,15 @@ namespace GoodByeMilk.CalendarCell {
     protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data) {
       base.OnActivityResult(requestCode, resultCode, data);
       switch(requestCode) {
-      case MENU_EDIT:
-        var editResult = data.GetParcelableArrayListExtra("editResult").Cast<Util.BabyFood>().ToList();
-        foodList_.AddRange(editResult);
-        adapter_.NotifyDataSetChanged();
+      case CAMERA:
+
+        if(resultCode == Result.Ok) {
+          imageList_.Add(intentPath_);
+          registerDatabase(intentPath_);
+          cameraAdapter_.NotifyItemInserted(imageList_.Count);
+        } else {
+        }
+
         break;
       default:
         break;
@@ -176,6 +229,62 @@ namespace GoodByeMilk.CalendarCell {
       default:
         return base.OnKeyDown(keyCode, e);
       }
+    }
+
+    public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults) {
+      base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+      if(requestCode == 0xFF) {
+        // 使用が許可された
+        if(grantResults.Where(p => p == Permission.Denied).Count() == 0) cameraIntent();
+      }
+    }
+
+
+
+
+    // Runtime Permission check
+    private bool checkPermission() {
+      // 既に許可している
+      return CheckSelfPermission(Android.Manifest.Permission.Camera) == Permission.Granted &&
+        CheckSelfPermission(Android.Manifest.Permission.WriteExternalStorage) == Permission.Granted;
+    }
+
+    private void requestPermission() {
+      if(ShouldShowRequestPermissionRationale(Android.Manifest.Permission.Camera) ||
+        ShouldShowRequestPermissionRationale(Android.Manifest.Permission.WriteExternalStorage)) {
+        RequestPermissions(new String[] {
+          Android.Manifest.Permission.Camera,
+          Android.Manifest.Permission.WriteExternalStorage}, 0xFF);
+      } else {
+        RequestPermissions(new String[] {
+          Android.Manifest.Permission.Camera,
+          Android.Manifest.Permission.WriteExternalStorage}, 0xFF);
+      }
+    }
+
+    private void cameraIntent() {
+      // ファイル名
+      intentPath_ = System.IO.Path.Combine(new[] {
+        GetExternalFilesDir(null).Path,
+        date_.Year.ToString(),
+        date_.Month.ToString(),
+        date_.Day.ToString(),
+        DateTime.Now.ToString("HHmmss") + ".jpg"
+    });
+
+      var cameraUri = Android.Support.V4.Content.FileProvider.GetUriForFile(ApplicationContext, Application.PackageName + ".fileprovider", new Java.IO.File(intentPath_));
+
+      Intent intent = new Intent(Android.Provider.MediaStore.ActionImageCapture);
+      intent.PutExtra(Android.Provider.MediaStore.ExtraOutput, cameraUri);
+      StartActivityForResult(intent, CAMERA);
+    }
+    private void registerDatabase(string _path) {
+      ContentValues contentValues = new ContentValues();
+      ContentResolver contentResolver = ApplicationContext.ContentResolver;
+      contentValues.Put(Android.Provider.MediaStore.Images.Media.InterfaceConsts.MimeType, "image/jpeg");
+      contentValues.Put("_data", _path);
+      contentResolver.Insert(
+              Android.Provider.MediaStore.Images.Media.ExternalContentUri, contentValues);
     }
   }
 }

@@ -75,6 +75,8 @@
     <Compile Include="MenuEditor\MenuEditorItemTouchHelper.cs" />
     <Compile Include="Util\BabyFood.cs" />
     <Compile Include="Util\ListItemTouchHelper.cs" />
+    <Compile Include="CalendarCell\Camera\CameraAdapter.cs" />
+    <Compile Include="CalendarCell\Camera\CameraViewHolder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
@@ -131,6 +133,18 @@
       <SubType></SubType>
       <Generator></Generator>
     </AndroidResource>
+    <AndroidResource Include="Resources\layout\imageview.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\xml\file_paths.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
+    <AndroidResource Include="Resources\drawable\border.xml">
+      <SubType></SubType>
+      <Generator></Generator>
+    </AndroidResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
@@ -138,6 +152,8 @@
     <Folder Include="MainView\" />
     <Folder Include="CalendarCell\" />
     <Folder Include="MenuEditor\" />
+    <Folder Include="CalendarCell\Camera\" />
+    <Folder Include="Resources\xml\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xamarin.Android.Support.Design" Version="28.0.0.3" />
