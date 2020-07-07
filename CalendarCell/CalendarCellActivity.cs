@@ -15,7 +15,7 @@ using Android.Support.V7.Widget.Helper;
 using Android.Content.PM;
 
 namespace GoodByeMilk.CalendarCell {
-  [Activity(Label = "CalendarCellActivity")]
+  [Activity(Label = "CalendarCellActivity", WindowSoftInputMode = SoftInput.AdjustPan)]
   public class CalendarCellActivity : Activity {
     const int CAMERA = 0x00;
     List<Util.BabyFood> foodList_;
@@ -86,7 +86,7 @@ namespace GoodByeMilk.CalendarCell {
 
       #region Click FAB
       FindViewById<FloatingActionButton>(Resource.Id.EditFoodMenu).Click += (sender, e) => {
-        /*var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
+        var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
         var view = LayoutInflater.Inflate(Resource.Layout.food_list_element_edit, null);
         view.SetBackgroundColor(new Android.Graphics.Color(GetColor(Resource.Color.mintcream)));
         var popup = new PopupWindow(this);
@@ -119,14 +119,20 @@ namespace GoodByeMilk.CalendarCell {
         };
 
 
-        popup.ShowAtLocation(recycler_, GravityFlags.Center, 0, (int)(-point.Y * 0.1));*/
+        popup.ShowAtLocation(recycler_, GravityFlags.Center, 0, (int)(-point.Y * 0.1));
+        //        StartActivityForResult(intent, MENU_EDIT);
+      };
+
+
+
+      FindViewById<FloatingActionButton>(Resource.Id.AddPhoto).Click += (sender, e) => {
+
         if(Build.VERSION.SdkInt >= BuildVersionCodes.M) {
           if(checkPermission()) cameraIntent();
           else requestPermission();
         } else {
           cameraIntent();
         }
-        //        StartActivityForResult(intent, MENU_EDIT);
       };
       #endregion
 
@@ -175,8 +181,8 @@ namespace GoodByeMilk.CalendarCell {
       #endregion
 
       #region Swipe List Element
-      var itemTouchHelperCallback = new Util.ListItemTouchHelper();
-      itemTouchHelperCallback.onSwipe += (sender, _) => {
+      var foodItemTouchHelperCallback = new Util.ListItemTouchHelper();
+      foodItemTouchHelperCallback.onSwipe += (sender, _) => {
         var archive = new KeyValuePair<int, Util.BabyFood>(((RecyclerView.ViewHolder)sender).AdapterPosition, foodList_[((RecyclerView.ViewHolder)sender).AdapterPosition]);
         foodList_.RemoveAt(((RecyclerView.ViewHolder)sender).AdapterPosition);
         adapter_.NotifyItemRemoved(((RecyclerView.ViewHolder)sender).AdapterPosition);
@@ -190,12 +196,71 @@ namespace GoodByeMilk.CalendarCell {
       };
 
 
-      var itemTouchHelper = new ItemTouchHelper(itemTouchHelperCallback);
-      itemTouchHelper.AttachToRecyclerView(recycler_);
+      var foodItemTouchHelper = new ItemTouchHelper(foodItemTouchHelperCallback);
+      foodItemTouchHelper.AttachToRecyclerView(recycler_);
       #endregion
 
-      // Create your application here
+
+      cameraAdapter_.onClick += (position) => {
+        var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
+        var view = LayoutInflater.Inflate(Resource.Layout.imageview, null);
+        view.SetBackgroundColor(new Android.Graphics.Color(GetColor(Resource.Color.mintcream)));
+
+        var popup = new PopupWindow(this);
+        popup.OutsideTouchable = true;
+        popup.Focusable = true;
+
+        popup.ContentView = view;
+        popup.SetBackgroundDrawable(GetDrawable(Resource.Drawable.abc_popup_background_mtrl_mult));
+        popup.Width = (int)(point.X * 0.8);
+        popup.Height = (int)(point.Y * 0.8);
+
+        var imageView = view.FindViewById<ImageView>(Resource.Id.image);
+        imageView.SetImageURI(Android.Net.Uri.FromFile(new Java.IO.File(imageList_[position])));
+
+
+        //Android.Media.ExifInterface exif = new Android.Media.ExifInterface(imageList_[position]);
+        //var orientation = int.Parse(exif.GetAttribute(Android.Media.ExifInterface.TagOrientation));
+        //var imageWidth = float.Parse(exif.GetAttribute(Android.Media.ExifInterface.TagImageWidth));
+        //var imageHeight = float.Parse(exif.GetAttribute(Android.Media.ExifInterface.TagImageLength));
+        //var viewWidth = point.X * 0.7;
+        //var viewHeight = point.X * 0.75;
+        //var mat = new Android.Graphics.Matrix();
+
+        popup.ShowAtLocation(recycler_, GravityFlags.Center, 0, 0);
+      };
+
+
+      var cameraItemTouchHelperCallback = new Util.ListItemTouchHelper(ItemTouchHelper.Left | ItemTouchHelper.Right, ItemTouchHelper.Up | ItemTouchHelper.Down);
+      cameraItemTouchHelperCallback.onSwipe += (sender, _) => {
+        var archive = new KeyValuePair<int, string>(((RecyclerView.ViewHolder)sender).AdapterPosition, imageList_[((RecyclerView.ViewHolder)sender).AdapterPosition]);
+        imageList_.RemoveAt(((RecyclerView.ViewHolder)sender).AdapterPosition);
+        cameraAdapter_.NotifyItemRemoved(((RecyclerView.ViewHolder)sender).AdapterPosition);
+        //adapter_.NotifyItemRangeChanged(archive.Key, foodList_.Count - archive.Key);
+        Util.SnackbarCallback callback = new Util.SnackbarCallback();
+        callback.onDismissed += () => {
+          if(archive.Value != null)
+            System.IO.File.Delete(archive.Value);
+        };
+
+        var snackbar = Snackbar.Make(recycler_, "データを削除しました", Snackbar.LengthLong).SetAction("元に戻す", (v) => {
+          imageList_.Insert(archive.Key, archive.Value);
+          cameraAdapter_.NotifyItemInserted(archive.Key);
+          archive = new KeyValuePair<int, string>(0, null);
+          //adapter_.NotifyItemRangeChanged(archive.Key + 1, foodList_.Count - archive.Key + 1);
+        });
+        snackbar.AddCallback(callback);
+        snackbar.Show();
+      };
+
+
+      var cameraItemTouchHelper = new ItemTouchHelper(cameraItemTouchHelperCallback);
+      cameraItemTouchHelper.AttachToRecyclerView(image_);
+
+
     }
+
+
 
 
     protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data) {
@@ -282,9 +347,11 @@ namespace GoodByeMilk.CalendarCell {
       ContentValues contentValues = new ContentValues();
       ContentResolver contentResolver = ApplicationContext.ContentResolver;
       contentValues.Put(Android.Provider.MediaStore.Images.Media.InterfaceConsts.MimeType, "image/jpeg");
-      contentValues.Put("_data", _path);
-      contentResolver.Insert(
-              Android.Provider.MediaStore.Images.Media.ExternalContentUri, contentValues);
+      contentValues.Put(Android.Provider.MediaStore.MediaColumns.Data, _path);
+      contentResolver.Insert(Android.Provider.MediaStore.Images.Media.ExternalContentUri, contentValues);
+      var intent = new Intent(Intent.ActionMediaScannerScanFile);
+      intent.SetData(Android.Net.Uri.FromFile(new Java.IO.File(_path)));
+      SendBroadcast(intent);
     }
   }
 }

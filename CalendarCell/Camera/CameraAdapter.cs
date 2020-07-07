@@ -10,6 +10,9 @@ namespace GoodByeMilk.CalendarCell.Camera {
   public class CameraAdapter : RecyclerView.Adapter {
     IReadOnlyList<string> image_;
     Context context_;
+    RecyclerView recycler_;
+
+    public Action<int> onClick;
     public CameraAdapter(Context _context, IReadOnlyList<string> _path) {
       context_ = _context;
       image_ = _path;
@@ -51,9 +54,25 @@ namespace GoodByeMilk.CalendarCell.Camera {
         }
         thumbnail = Android.Graphics.Bitmap.CreateBitmap(thumbnail, 0, 0, thumbnail.Width, thumbnail.Height, mat, true);
         ((CameraViewHolder)holder).image_.SetImageBitmap(thumbnail);
-
-
       }
+
+      holder.ItemView.Click -= ItemView_Click;
+      holder.ItemView.Click += ItemView_Click;
+    }
+
+    private void ItemView_Click(object sender, EventArgs e) {
+      var position = recycler_.GetChildAdapterPosition((View)sender);
+      onClick.Invoke(position);
+    }
+
+    public override void OnAttachedToRecyclerView(RecyclerView recyclerView) {
+      base.OnAttachedToRecyclerView(recyclerView);
+      recycler_ = recyclerView;
+    }
+
+    public override void OnDetachedFromRecyclerView(RecyclerView recyclerView) {
+      base.OnDetachedFromRecyclerView(recyclerView);
+      recycler_ = null;
     }
 
     public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType) {

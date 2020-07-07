@@ -30,9 +30,20 @@
 	<android.support.design.widget.FloatingActionButton
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:id="@+id/EditFoodMenu"
+		android:id="@+id/AddPhoto"
 		android:layout_alignParentBottom="true"
 		android:layout_alignParentRight="true"
 		android:layout_marginRight="30dp"
-		android:layout_marginBottom="30dp"/>
+		android:layout_marginBottom="30dp"
+		android:src="@drawable/photo"/>
+	
+	<android.support.design.widget.FloatingActionButton
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/EditFoodMenu"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"
+		android:layout_marginRight="100dp"
+		android:layout_marginBottom="30dp"
+		android:src="@drawable/food"/>
 </RelativeLayout>
