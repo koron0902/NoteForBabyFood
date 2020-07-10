@@ -38,8 +38,6 @@
     <EmbedAssembliesIntoApk>False</EmbedAssembliesIntoApk>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugSymbols>True</DebugSymbols>
-    <DebugType>portable</DebugType>
     <Optimize>True</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -47,8 +45,16 @@
     <WarningLevel>4</WarningLevel>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
-    <AndroidLinkMode>SdkOnly</AndroidLinkMode>
+    <AndroidLinkMode>Full</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+<AndroidLinkSkip>Android.Support.V4, Android.Support.V7</AndroidLinkSkip>
+<AndroidKeyStore>True</AndroidKeyStore>
+<AndroidSigningKeyStore>/Users/Keita/Projects/milkcocoa.keystore</AndroidSigningKeyStore>
+<AndroidSigningStorePass>koronAs0102054</AndroidSigningStorePass>
+<AndroidSigningKeyAlias>milkcocoa</AndroidSigningKeyAlias>
+<AndroidSigningKeyPass>koronAs0102054</AndroidSigningKeyPass>
+<AndroidPackageFormat>aab</AndroidPackageFormat>
+<AndroidLinkTool>r8</AndroidLinkTool>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
