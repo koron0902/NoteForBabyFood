@@ -55,7 +55,12 @@ namespace GoodByeMilk.CalendarCell {
         imageList_ = System.IO.Directory.GetFiles(path_).ToList();
       }
 
-      cameraAdapter_ = new Camera.CameraAdapter(ApplicationContext, imageList_);
+      // 時間が経つとデータベースから消えているので再登録
+      foreach(var img in imageList_) {
+        registerDatabase(img);
+      }
+
+      cameraAdapter_ = new Camera.CameraAdapter(this, imageList_);
       var cameraManager = new LinearLayoutManager(this);
       cameraManager.Orientation = LinearLayoutManager.Horizontal;
       image_ = FindViewById<RecyclerView>(Resource.Id.imageList);
@@ -75,7 +80,7 @@ namespace GoodByeMilk.CalendarCell {
       this.WindowManager.DefaultDisplay.GetSize(point);
 
       recycler_ = FindViewById<RecyclerView>(Resource.Id.foodList);
-      adapter_ = new CalendarCellAdapter(ApplicationContext, foodList_);
+      adapter_ = new CalendarCellAdapter(this, foodList_);
       var manager_ = new LinearLayoutManager(this);
       recycler_.HasFixedSize = false;
       recycler_.SetLayoutManager(manager_);
@@ -86,7 +91,6 @@ namespace GoodByeMilk.CalendarCell {
 
       #region Click FAB
       FindViewById<FloatingActionButton>(Resource.Id.EditFoodMenu).Click += (sender, e) => {
-        var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
         var view = LayoutInflater.Inflate(Resource.Layout.food_list_element_edit, null);
         view.SetBackgroundColor(new Android.Graphics.Color(GetColor(Resource.Color.mintcream)));
         var popup = new PopupWindow(this);
@@ -138,8 +142,6 @@ namespace GoodByeMilk.CalendarCell {
 
       #region Click List Element
       adapter_.onClick += (position) => {
-
-        var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
         var view = LayoutInflater.Inflate(Resource.Layout.food_list_element_edit, null);
         view.SetBackgroundColor(new Android.Graphics.Color(GetColor(Resource.Color.mintcream)));
 
@@ -202,7 +204,6 @@ namespace GoodByeMilk.CalendarCell {
 
 
       cameraAdapter_.onClick += (position) => {
-        var intent = new Intent(this, typeof(MenuEditor.MenuEditorActivity));
         var view = LayoutInflater.Inflate(Resource.Layout.imageview, null);
         view.SetBackgroundColor(new Android.Graphics.Color(GetColor(Resource.Color.mintcream)));
 
@@ -337,15 +338,16 @@ namespace GoodByeMilk.CalendarCell {
         DateTime.Now.ToString("HHmmss") + ".jpg"
     });
 
-      var cameraUri = Android.Support.V4.Content.FileProvider.GetUriForFile(ApplicationContext, Application.PackageName + ".fileprovider", new Java.IO.File(intentPath_));
+      var cameraUri = Android.Support.V4.Content.FileProvider.GetUriForFile(this, Application.PackageName + ".fileprovider", new Java.IO.File(intentPath_));
 
       Intent intent = new Intent(Android.Provider.MediaStore.ActionImageCapture);
       intent.PutExtra(Android.Provider.MediaStore.ExtraOutput, cameraUri);
       StartActivityForResult(intent, CAMERA);
     }
+
     private void registerDatabase(string _path) {
       ContentValues contentValues = new ContentValues();
-      ContentResolver contentResolver = ApplicationContext.ContentResolver;
+      ContentResolver contentResolver = ContentResolver;
       contentValues.Put(Android.Provider.MediaStore.Images.Media.InterfaceConsts.MimeType, "image/jpeg");
       contentValues.Put(Android.Provider.MediaStore.MediaColumns.Data, _path);
       contentResolver.Insert(Android.Provider.MediaStore.Images.Media.ExternalContentUri, contentValues);

@@ -41,10 +41,9 @@ namespace GoodByeMilk {
       nextButton.Click += (sender, e) => {
         mCalendarAdapter.nextMonth();
         titleText.Text = mCalendarAdapter.getTitle();
-
       };
 
-      dataManager_ = new Util.DataManager(ApplicationContext);
+      dataManager_ = new Util.DataManager(this);
 
       calendarGridView = FindViewById<GridView>(Resource.Id.calendarGridView);
       mCalendarAdapter = new MainView.CalendarAdapter(this, dataManager_.dataRef_);

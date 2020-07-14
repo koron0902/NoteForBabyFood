@@ -23,5 +23,7 @@ Global
 		$2.CommitMessageStyle = $3
 		$3.LastFilePostfix = "@:\n  "
 		$3.IncludeDirectoryPaths = True
+		$3.LineAlign = 0
+		version = 0.2
 	EndGlobalSection
 EndGlobal

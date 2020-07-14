@@ -24,6 +24,7 @@
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
     <AndroidEnableSGenConcurrent>true</AndroidEnableSGenConcurrent>
     <AndroidUseAapt2>true</AndroidUseAapt2>
+    <ReleaseVersion>0.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>True</DebugSymbols>
@@ -45,9 +46,7 @@
     <WarningLevel>4</WarningLevel>
     <AndroidManagedSymbols>true</AndroidManagedSymbols>
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
-    <AndroidLinkMode>Full</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
-<AndroidLinkSkip>Android.Support.V4, Android.Support.V7</AndroidLinkSkip>
 <AndroidKeyStore>True</AndroidKeyStore>
 <AndroidSigningKeyStore>/Users/Keita/Projects/milkcocoa.keystore</AndroidSigningKeyStore>
 <AndroidSigningStorePass>koronAs0102054</AndroidSigningStorePass>
@@ -55,6 +54,7 @@
 <AndroidSigningKeyPass>koronAs0102054</AndroidSigningKeyPass>
 <AndroidPackageFormat>aab</AndroidPackageFormat>
 <AndroidLinkTool>r8</AndroidLinkTool>
+<AndroidEnableMultiDex>true</AndroidEnableMultiDex>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

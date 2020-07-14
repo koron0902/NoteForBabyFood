@@ -4,6 +4,7 @@ using Android.Support.Design.Widget;
 namespace GoodByeMilk.Util {
   public class SnackbarCallback : Snackbar.Callback {
     public Action onDismissed = null;
+
     public SnackbarCallback() {
     }
 
