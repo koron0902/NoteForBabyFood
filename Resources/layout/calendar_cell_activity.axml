@@ -19,21 +19,31 @@
 		android:paddingBottom="25dp"
 		android:id="@+id/foodList"
 		android:layout_below="@id/dateTimeInCell"/>
-	<LinearLayout
+	<android.support.v7.widget.RecyclerView
 		android:orientation="horizontal"
 		android:minWidth="25px"
 		android:minHeight="25px"
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:gravity="bottom"
 		android:layout_below="@id/foodList"
-		android:id="@+id/linearLayout1" />
+		android:id="@+id/imageList" />
+	<android.support.design.widget.FloatingActionButton
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:id="@+id/AddPhoto"
+		android:layout_alignParentBottom="true"
+		android:layout_alignParentRight="true"
+		android:layout_marginRight="30dp"
+		android:layout_marginBottom="30dp"
+		android:src="@drawable/photo"/>
+	
 	<android.support.design.widget.FloatingActionButton
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
 		android:id="@+id/EditFoodMenu"
 		android:layout_alignParentBottom="true"
 		android:layout_alignParentRight="true"
-		android:layout_marginRight="30dp"
-		android:layout_marginBottom="30dp"/>
+		android:layout_marginRight="100dp"
+		android:layout_marginBottom="30dp"
+		android:src="@drawable/food"/>
 </RelativeLayout>

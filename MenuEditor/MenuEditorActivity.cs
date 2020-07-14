@@ -18,7 +18,7 @@ namespace GoodByeMilk.MenuEditor {
   [Activity(Label = "MenuEditorActivity")]
   public class MenuEditorActivity : Activity {
 
-    List<Util.Data> foodList;
+    List<Util.BabyFood> foodList;
     RecyclerView recycler;
     Button addButton;
     protected override void OnCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ namespace GoodByeMilk.MenuEditor {
 
       Android.Graphics.Point point = new Android.Graphics.Point();
       this.WindowManager.DefaultDisplay.GetSize(point);
-      foodList = new List<Util.Data>();
+      foodList = new List<Util.BabyFood>();
       recycler = FindViewById<RecyclerView>(Resource.Id.MenuListHolder);
       var adapter = new MenuEditorAdapter(foodList);
       var manager_ = new LinearLayoutManager(this);
@@ -40,13 +40,13 @@ namespace GoodByeMilk.MenuEditor {
 
       addButton = FindViewById<Button>(Resource.Id.addElement);
       addButton.Click += (sender, e) => {
-        foodList.Add(new Util.Data(Util.Data.Kind.EVENING, DateTime.Now, "", "", 0));
+        foodList.Add(new Util.BabyFood(Util.BabyFood.Kind.EVENING, DateTime.Now, "", "", 0));
         adapter.NotifyDataSetChanged();
       };
 
       var itemTouchHelperCallback = new MenuEditorItemTouchHelper();
       itemTouchHelperCallback.onSwipe += (sender, e) => {
-        var archive = new KeyValuePair<int, Util.Data>(((RecyclerView.ViewHolder)sender).AdapterPosition, foodList[((RecyclerView.ViewHolder)sender).AdapterPosition]);
+        var archive = new KeyValuePair<int, Util.BabyFood>(((RecyclerView.ViewHolder)sender).AdapterPosition, foodList[((RecyclerView.ViewHolder)sender).AdapterPosition]);
         foodList.RemoveAt(((RecyclerView.ViewHolder)sender).AdapterPosition);
         adapter.NotifyItemRemoved(((RecyclerView.ViewHolder)sender).AdapterPosition);
         Snackbar.Make(addButton, "qfewf", Snackbar.LengthLong).SetAction("元に戻す", (v) => {

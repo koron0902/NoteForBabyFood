@@ -4,14 +4,14 @@ using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Support.V7.Widget.Helper;
 
-namespace GoodByeMilk.MenuEditor {
-  public class MenuEditorItemTouchHelper : ItemTouchHelper.SimpleCallback {
+namespace GoodByeMilk.Util {
+  public class ListItemTouchHelper : ItemTouchHelper.SimpleCallback {
     public Action<RecyclerView.ViewHolder, int> onSwipe;
     public Func<RecyclerView, RecyclerView.ViewHolder, RecyclerView.ViewHolder, bool> onMove;
-    public MenuEditorItemTouchHelper(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) {
+    public ListItemTouchHelper(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer) {
     }
 
-    public MenuEditorItemTouchHelper(int dragDirs = ItemTouchHelper.Up | ItemTouchHelper.Down,
+    public ListItemTouchHelper(int dragDirs = ItemTouchHelper.Up | ItemTouchHelper.Down,
       int swipeDirs = ItemTouchHelper.Left | ItemTouchHelper.Right) : base(dragDirs, swipeDirs) {
 
     }
