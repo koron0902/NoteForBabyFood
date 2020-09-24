@@ -10,6 +10,7 @@ using System.Linq;
 namespace GoodByeMilk.MainView {
   public class CalendarAdapter : BaseAdapter {
     private List<DateTime> dateArray = new List<DateTime>();
+    public IReadOnlyList<DateTime> dateArrayRef;
     private Context mContext;
     private Util.DateManager dateManager_;
     private LayoutInflater mLayoutInflater;
@@ -23,6 +24,7 @@ namespace GoodByeMilk.MainView {
       mLayoutInflater = LayoutInflater.From(mContext);
       dateManager_ = new Util.DateManager();
       dateArray = dateManager_.getDays();
+      dateArrayRef = dateArray;
     }
 
 
@@ -109,6 +111,8 @@ namespace GoodByeMilk.MainView {
       dateManager_.nextMonth();
       dateArray = dateManager_.getDays();
       this.NotifyDataSetChanged();
+
+      dateArrayRef = dateArray;
     }
 
     //前月表示
@@ -116,6 +120,8 @@ namespace GoodByeMilk.MainView {
       dateManager_.prevMonth();
       dateArray = dateManager_.getDays();
       this.NotifyDataSetChanged();
+
+      dateArrayRef = dateArray;
     }
 
     public override Java.Lang.Object GetItem(int position) {
