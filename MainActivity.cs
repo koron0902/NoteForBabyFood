@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Android.App;
+using Android.Content;
+using Android.Content.PM;
+using Android.Media;
 using Android.OS;
 using Android.Runtime;
-using Android.Support.Design.Widget;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
-using System.Linq;
-using Android.Content;
-using Android.Content.PM;
 
 namespace GoodByeMilk {
   [Activity(Label = "@string/app_name", Theme = "@style/AppTheme.NoActionBar", MainLauncher = true)]
@@ -138,7 +139,6 @@ namespace GoodByeMilk {
         RequestPermissions(req, 0xFF);
       }
     }
-
   }
 }
 
