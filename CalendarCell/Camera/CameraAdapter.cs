@@ -5,6 +5,7 @@ using Android.Runtime;
 using Android.Support.V7.Widget;
 using Android.Views;
 using Android.Provider;
+using Android.Graphics;
 
 namespace GoodByeMilk.CalendarCell.Camera {
   public class CameraAdapter : RecyclerView.Adapter {
@@ -26,35 +27,43 @@ namespace GoodByeMilk.CalendarCell.Camera {
     public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position) {
       ContentResolver cr = context_.ContentResolver;
       /** 画像をファイルパスから検索 */
-      var cursor = cr.Query(
-                          MediaStore.Images.Media.ExternalContentUri,
-                          null,
-                          MediaStore.Images.ImageColumns.Data + " = ?",
-                          new String[] { image_[position] },
-                          null);
-
-      if(cursor != null && cursor.MoveToFirst()) {
-        /** 画像のIDを取得 */
-        long id = cursor.GetLong(cursor.GetColumnIndex(MediaStore.Images.ImageColumns.Id));
-        Android.Media.ExifInterface exif = new Android.Media.ExifInterface(image_[position]);
-        //var orientation = int.Parse(exif.GetAttribute(Android.Media.ExifInterface.TagOrientation));
-        /** IDから96x96のサムネイルを取得 */
-
-        var thumbnail = MediaStore.Images.Thumbnails.GetThumbnail(
-                cr, id, ThumbnailKind.MiniKind, null);
-        cursor.Close();
-        Android.Graphics.Matrix mat = new Android.Graphics.Matrix();
 
 
-        if(thumbnail.Width > thumbnail.Height) {
-          mat.SetRotate(90, thumbnail.Width / 2, thumbnail.Height / 2);
-          mat.PreScale(320.0f / thumbnail.Width, 240.0f / thumbnail.Height);
-        } else {
-          mat.PreScale(240.0f / thumbnail.Width, 320.0f / thumbnail.Height);
+      BitmapFactory.Options options = new BitmapFactory.Options();
+      options.InJustDecodeBounds = true;
+      var bitmap = BitmapFactory.DecodeFile(image_[position]);
+      int imageHeight = bitmap.Height;
+      int imageWidth = bitmap.Width;
+      String imageType = options.OutMimeType;
+      int inSampleSize = 1;
+
+      if(imageHeight > 320 || imageWidth > 240) {
+        int halfHeight = imageHeight / 2;
+        int halfWidth = imageWidth / 2;
+
+        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+        // height and width larger than the requested height and width.
+        while((halfHeight / inSampleSize) >= 320
+                && (halfWidth / inSampleSize) >= 240) {
+          inSampleSize *= 2;
         }
-        thumbnail = Android.Graphics.Bitmap.CreateBitmap(thumbnail, 0, 0, thumbnail.Width, thumbnail.Height, mat, true);
-        ((CameraViewHolder)holder).image_.SetImageBitmap(thumbnail);
       }
+      options.InSampleSize = inSampleSize;
+      options.InJustDecodeBounds = false;
+      Android.Media.ExifInterface exif = new Android.Media.ExifInterface(image_[position]);
+      //var orientation = int.Parse(exif.GetAttribute(Android.Media.ExifInterface.TagOrientation));
+      var thumbnail = BitmapFactory.DecodeFile(image_[position], options);
+      Android.Graphics.Matrix mat = new Android.Graphics.Matrix();
+
+
+      if(thumbnail.Width > thumbnail.Height) {
+        mat.SetRotate(90, thumbnail.Width / 2, thumbnail.Height / 2);
+        mat.PreScale(320.0f / thumbnail.Width, 240.0f / thumbnail.Height);
+      } else {
+        mat.PreScale(240.0f / thumbnail.Width, 320.0f / thumbnail.Height);
+      }
+      thumbnail = Android.Graphics.Bitmap.CreateBitmap(thumbnail, 0, 0, thumbnail.Width, thumbnail.Height, mat, true);
+      ((CameraViewHolder)holder).image_.SetImageBitmap(thumbnail);
 
       holder.ItemView.Click -= ItemView_Click;
       holder.ItemView.Click += ItemView_Click;

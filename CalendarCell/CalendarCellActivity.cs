@@ -55,10 +55,7 @@ namespace GoodByeMilk.CalendarCell {
         imageList_ = System.IO.Directory.GetFiles(path_).ToList();
       }
 
-      // 時間が経つとデータベースから消えているので再登録
-      foreach(var img in imageList_) {
-        registerDatabase(img);
-      }
+
 
       cameraAdapter_ = new Camera.CameraAdapter(this, imageList_);
       var cameraManager = new LinearLayoutManager(this);
@@ -271,7 +268,6 @@ namespace GoodByeMilk.CalendarCell {
 
         if(resultCode == Result.Ok) {
           imageList_.Add(intentPath_);
-          registerDatabase(intentPath_);
           cameraAdapter_.NotifyItemInserted(imageList_.Count);
         } else {
         }
@@ -343,17 +339,6 @@ namespace GoodByeMilk.CalendarCell {
       Intent intent = new Intent(Android.Provider.MediaStore.ActionImageCapture);
       intent.PutExtra(Android.Provider.MediaStore.ExtraOutput, cameraUri);
       StartActivityForResult(intent, CAMERA);
-    }
-
-    private void registerDatabase(string _path) {
-      ContentValues contentValues = new ContentValues();
-      ContentResolver contentResolver = ContentResolver;
-      contentValues.Put(Android.Provider.MediaStore.Images.Media.InterfaceConsts.MimeType, "image/jpeg");
-      contentValues.Put(Android.Provider.MediaStore.MediaColumns.Data, _path);
-      contentResolver.Insert(Android.Provider.MediaStore.Images.Media.ExternalContentUri, contentValues);
-      var intent = new Intent(Intent.ActionMediaScannerScanFile);
-      intent.SetData(Android.Net.Uri.FromFile(new Java.IO.File(_path)));
-      SendBroadcast(intent);
     }
   }
 }
